@@ -150,6 +150,11 @@ class Mikrotik extends RouterosAPI{
         }
 
     }
+    public function RemoveSecret($user){
+        $this->comm("/ppp/secret/remove", array(
+            "numbers" => $user,
+        ));
+    }
 
 
     public function __destruct() {
