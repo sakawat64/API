@@ -57,7 +57,7 @@ class Mikrotik extends RouterosAPI{
     
     public function monitorTrafic(){
         
-        $this->write('/interface/monitor-traffic', true);
+        $this->write('/interface/monitor-traffic', FALSE);
         $this->write('=interface=LAN',false);
         $this->write('=once=');
         $READ = $this->read(false);
@@ -118,6 +118,36 @@ class Mikrotik extends RouterosAPI{
             "password" => $password,
             "profile" => $profile,
         ));
+
+    }
+    public function updateOnlyprofile($user, $profile, $existingUsername){
+
+        $this->comm("/ppp/secret/set", array(
+            "numbers" => $existingUsername,
+            "name" => $user,
+            "profile" => $profile,
+        ));
+
+    }
+    public function CreateFirewall($id, $ip, $block){
+             $this->write('/ip/firewall/address-list/add',false);
+            $this->write('=list='.$id,false);
+            $this->write('=address='.$ip,false);
+            $this->write('=comment='.$block,true);
+            $READ = $this->read(false);
+            $ARRAY = $this->parseResponse($READ);
+
+    }
+    public function RemoveFirewall($comment){
+        $this->write('/ip/firewall/address-list/print',false);
+        $this->write('?comment='.$comment,true);
+        $READ = $this->read(false);
+        $ARRAY = $this->parseResponse($READ);
+        if(count($ARRAY)>0){
+            $this->write('/ip/firewall/address-list/remove', false);
+            $this->write('=.id=' . $ARRAY[0]['.id']);
+            $READ = $this->read(false);
+        }
 
     }
 
